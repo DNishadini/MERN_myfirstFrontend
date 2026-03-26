@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AdminPage from "./pages/adminPage";
+import HomePage from "./pages/homePage";
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
       "
       >
         <Routes path="/">
-          <Route path="/" element={<h1>Home Page</h1>} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<h1>Register Page</h1>} />
           <Route path="/admin/*" element={<AdminPage />} />
         </Routes>
