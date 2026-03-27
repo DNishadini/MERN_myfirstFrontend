@@ -5,13 +5,14 @@ import { MdOutlineShoppingCartCheckout } from "react-icons/md";
 import { BsBox2Heart } from "react-icons/bs";
 import { FiUsers } from "react-icons/fi";
 import AdminProductPage from "./admin/adminProductPage";
+import AdminAddNewProduct from "./admin/adminAddNewProduct";
 
 export default function AdminPage() {
   return (
     <div className="h-full w-full bg-primary flex  p-2">
       <div className="w-[300px] h-full bg-primary flex flex-col items-center gap-[20px]">
         <div className="flex flex-row w-[90%] h-[70px] bg-accent items-center rounded-2xl mb-[20px]">
-          <img src="logo.png" alt="logo" className="h-[80px]" />
+          <img src="/logo.png" alt="logo" className="h-[80px]" />
           <span className="text-white text-xl ml-4">Admin Panel</span>
         </div>
         <Link
@@ -50,6 +51,7 @@ export default function AdminPage() {
             <Route path="/" element={<h1>Admin Dashboard</h1>} />
             <Route path="/products" element={<AdminProductPage />} />
             <Route path="/orders" element={<h1>Manage Orders</h1>} />
+            <Route path="/add-product" element={<AdminAddNewProduct />} />
           </Routes>
         </div>
       </div>

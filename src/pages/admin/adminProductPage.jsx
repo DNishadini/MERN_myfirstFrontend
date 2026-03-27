@@ -1,100 +1,79 @@
 import axios from "axios";
-import { useState } from "react";
-
-const sampleData = [
-  {
-    productID: "P001",
-    name: "Smartphone",
-    description: "Latest model with 128GB storage, 6GB RAM, and a 48MP camera.",
-    altNames: ["Mobile", "Cell Phone", "Smart Device"],
-    price: 499.99,
-    labeledPrice: 599.99,
-    images: [
-      "https://example.com/images/smartphone1.jpg",
-      "https://example.com/images/smartphone2.jpg",
-    ],
-    category: "Electronics",
-  },
-  {
-    productID: "P002",
-    name: "Laptop",
-    description:
-      "14-inch laptop with an Intel i7 processor, 16GB RAM, and a 512GB SSD.",
-    altNames: ["Notebook", "Computer", "Laptop Computer"],
-    price: 899.99,
-    labeledPrice: 999.99,
-    images: [
-      "https://example.com/images/laptop1.jpg",
-      "https://example.com/images/laptop2.jpg",
-    ],
-    category: "Electronics",
-  },
-  {
-    productID: "P003",
-    name: "Wireless Headphones",
-    description:
-      "Noise-canceling over-ear headphones with 20 hours of battery life.",
-    altNames: ["Bluetooth Headphones", "Headset", "Earphones"],
-    price: 129.99,
-    labeledPrice: 149.99,
-    images: [
-      "https://example.com/images/headphones1.jpg",
-      "https://example.com/images/headphones2.jpg",
-    ],
-    category: "Audio",
-  },
-  {
-    productID: "P004",
-    name: "Smart Watch",
-    description:
-      "Water-resistant smartwatch with fitness tracking, heart rate monitoring, and GPS.",
-    altNames: ["Wrist Watch", "Fitness Watch", "Smart Band"],
-    price: 199.99,
-    labeledPrice: 249.99,
-    images: [
-      "https://example.com/images/smartwatch1.jpg",
-      "https://example.com/images/smartwatch2.jpg",
-    ],
-    category: "Wearables",
-  },
-  {
-    productID: "P005",
-    name: "Air Purifier",
-    description:
-      "HEPA filter air purifier with three fan speeds and quiet operation.",
-    altNames: ["Air Cleaner", "Air Filter", "Air Cleaner Device"],
-    price: 149.99,
-    labeledPrice: 179.99,
-    images: [
-      "https://example.com/images/airpurifier1.jpg",
-      "https://example.com/images/airpurifier2.jpg",
-    ],
-    category: "Home Appliances",
-  },
-];
+import { useEffect, useState } from "react";
+import { FaRegTrashCan } from "react-icons/fa6";
+import { FaRegEdit } from "react-icons/fa";
+import { CiCirclePlus } from "react-icons/ci";
+import { Link } from "react-router-dom";
 
 export default function AdminProductPage() {
-  const [products, setProducts] = useState(sampleData);
-  //   axios
-  //     .get(import.meta.env.VITE_API_URL + "/api/products")
-  //     .then((response) => {
-  //       console.log(response.data);
-  //     })
-  //     .catch();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(import.meta.env.VITE_API_URL + "/api/products")
+      .then((response) => {
+        console.log(response.data);
+        setProducts(response.data);
+      })
+      .catch();
+  }, []);
+
   return (
-    <div className="w-full h-full p-[10px]">
-      <table className="border">
-        <thead>
-          <tr>
-            <th>Product ID</th>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Labelled Price</th>
-            <th>Category</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div className="w-full h-full p-[20px] bg-gray-50">
+      <Link
+        to="/admin/add-product"
+        className="fixed right-[50px] bottom-[50px] text-5xl hover:text-accent"
+      >
+        <CiCirclePlus />
+      </Link>
+      <div className="overflow-x-auto rounded-lg shadow-lg">
+        <table className="w-full table-auto border-collapse">
+          <thead className="bg-primary text-white">
+            <tr>
+              <th className="py-3 px-6 text-left">Image</th>
+              <th className="py-3 px-6 text-left">Product ID</th>
+              <th className="py-3 px-6 text-left">Product Name</th>
+              <th className="py-3 px-6 text-left">Price</th>
+              <th className="py-3 px-6 text-left">Labelled Price</th>
+              <th className="py-3 px-6 text-left">Category</th>
+              <th className="py-3 px-6 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((item) => {
+              return (
+                <tr
+                  key={item.productID}
+                  className="border-b hover:bg-gray-100 transition-all"
+                >
+                  <td className="py-3 px-6 text-center">
+                    <img
+                      src={
+                        item.image && item.image.length > 0
+                          ? item.image[0]
+                          : "/default-image.jpg"
+                      }
+                      alt={item.name}
+                      className="w-16 h-16 object-cover mx-auto rounded-md"
+                    />
+                  </td>
+                  <td className="py-3 px-6">{item.productID}</td>
+                  <td className="py-3 px-6">{item.name}</td>
+                  <td className="py-3 px-6">{item.price}</td>
+                  <td className="py-3 px-6">{item.labeledPrice}</td>
+                  <td className="py-3 px-6">{item.category}</td>
+                  <td className="py-3 px-6 text-center">
+                    <div className="flex justify-center gap-4">
+                      <FaRegTrashCan className="text-xl text-red-500 hover:text-red-700 cursor-pointer transition-all" />
+                      <FaRegEdit className="text-xl text-accent hover:text-yellow-600 cursor-pointer transition-all" />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
