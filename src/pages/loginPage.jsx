@@ -1,20 +1,34 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   // Direct API call without environment variable
   async function login() {
-    const response = await axios.post(
-      import.meta.env.VITE_API_URL + "/api/users/login", // Direct API URL
-      {
-        email: email,
-        password: password,
-      },
-    );
-    console.log(response.data);
+    try {
+      const response = await axios.post(
+        import.meta.env.VITE_API_URL + "/api/users/login", // Direct API URL
+        {
+          email: email,
+          password: password,
+        },
+      );
+      console.log(response.data);
+
+      const user = response.data.user;
+
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    } catch (e) {
+      console.error("Login failed:", e);
+    }
   }
 
   return (
@@ -23,7 +37,7 @@ export default function LoginPage() {
       <div className="w-full sm:w-[450px] md:w-[500px] p-8 bg-white bg-opacity-80 backdrop-blur-md rounded-xl shadow-xl flex flex-col items-center space-y-8">
         {/* Welcome Back Text */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-extrabold text-[#6a0dad] mb-4">
+          <h1 className="text-5xl font-extrabold text-[#6a0dad] mb-4 bg-gradient-to-r from-[#6a0dad] to-[#f8b7d0] bg-clip-text text-transparent animate-gradient-x">
             Welcome Back!
           </h1>
           <p className="text-lg text-gray-600">
