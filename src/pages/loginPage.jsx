@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +18,8 @@ export default function LoginPage() {
           password: password,
         },
       );
-      console.log(response.data);
+
+      localStorage.setItem("token", response.data.token);
 
       const user = response.data.user;
 
@@ -28,6 +30,7 @@ export default function LoginPage() {
       }
     } catch (e) {
       console.error("Login failed:", e);
+      toast.error("Login failed. Please check your credentials and try again.");
     }
   }
 
