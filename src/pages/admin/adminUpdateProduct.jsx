@@ -1,22 +1,25 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import MediaUpload from "../../utils/mediaUpload";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-export default function AdminAddNewProduct() {
-  const [productId, setProductId] = useState("");
-  const [name, setName] = useState("");
-  const [altNames, setAltNames] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [category, setCategory] = useState("cream");
+export default function AdminUpdateProduct() {
+  const location = useLocation();
+  const [productId, setProductId] = useState(location.state.productID);
+  const [name, setName] = useState(location.state.name);
+  const [altNames, setAltNames] = useState(location.state.altNames.join(","));
+  const [description, setDescription] = useState(location.state.description);
+  const [price, setPrice] = useState(location.state.price);
+  const [category, setCategory] = useState(location.state.category);
   const [images, setImages] = useState([]);
-  const [labelledPrice, setLabelledPrice] = useState(0);
-  const [stock, setStock] = useState(0);
+  const [labelledPrice, setLabelledPrice] = useState(
+    location.state.labeledPrice,
+  );
+  const [stock, setStock] = useState(location.state.stock);
   const navigate = useNavigate();
 
-  async function addProducts() {
+  async function updateProducts() {
     const token = localStorage.getItem("token");
     if (token == null) {
       navigate("/login");
@@ -28,7 +31,10 @@ export default function AdminAddNewProduct() {
       promises[i] = MediaUpload(images[i]);
     }
     try {
-      const urls = await Promise.all(promises);
+      let urls = await Promise.all(promises);
+      if (urls.length === 0) {
+        urls = location.state.images;
+      }
       const alternativeNames = altNames.split(",");
       const product = {
         productID: productId,
@@ -41,8 +47,8 @@ export default function AdminAddNewProduct() {
         images: urls,
         category: category,
       };
-      await axios.post(
-        import.meta.env.VITE_API_URL + "/api/products",
+      await axios.put(
+        import.meta.env.VITE_API_URL + "/api/products" + productId,
         product,
         {
           headers: {
@@ -50,7 +56,7 @@ export default function AdminAddNewProduct() {
           },
         },
       );
-      toast.success("Product added successfully!");
+      toast.success("Product updated successfully!");
       navigate("/admin/products");
     } catch {
       toast.error("Image upload failed. Please try again.");
@@ -60,7 +66,7 @@ export default function AdminAddNewProduct() {
     <div className="w-full h-full flex justify-center items-center bg-primary p-8">
       <div className="w-full max-w-[650px] bg-white rounded-3xl shadow-xl p-8 space-y-6 border-2 border-accent overflow-y-auto max-h-screen">
         <h2 className="text-3xl font-semibold text-center text-accent mb-6">
-          Add New Product
+          Update Product
         </h2>
 
         <div className="space-y-6">
@@ -73,6 +79,7 @@ export default function AdminAddNewProduct() {
               Product ID
             </label>
             <input
+              disabled
               id="productId"
               type="text"
               value={productId}
@@ -230,7 +237,7 @@ export default function AdminAddNewProduct() {
         {/* Action Buttons */}
         <div className="flex justify-center mt-8 space-x-6">
           <button
-            onClick={addProducts}
+            onClick={updateProducts}
             className="w-full py-3 bg-accent text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-600 transition-all transform hover:scale-105"
           >
             Submit

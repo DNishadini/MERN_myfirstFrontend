@@ -4,9 +4,11 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { FaRegEdit } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminProductPage() {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -35,6 +37,7 @@ export default function AdminProductPage() {
               <th className="py-3 px-6 text-left">Product Name</th>
               <th className="py-3 px-6 text-left">Price</th>
               <th className="py-3 px-6 text-left">Labelled Price</th>
+              <th className="py-3 px-6 text-left">Stock</th>
               <th className="py-3 px-6 text-left">Category</th>
               <th className="py-3 px-6 text-center">Action</th>
             </tr>
@@ -61,11 +64,19 @@ export default function AdminProductPage() {
                   <td className="py-3 px-6">{item.name}</td>
                   <td className="py-3 px-6">{item.price}</td>
                   <td className="py-3 px-6">{item.labeledPrice}</td>
+                  <td className="py-3 px-6">{item.stock}</td>
                   <td className="py-3 px-6">{item.category}</td>
                   <td className="py-3 px-6 text-center">
                     <div className="flex justify-center gap-4">
                       <FaRegTrashCan className="text-xl text-red-500 hover:text-red-700 cursor-pointer transition-all" />
-                      <FaRegEdit className="text-xl text-accent hover:text-yellow-600 cursor-pointer transition-all" />
+                      <FaRegEdit
+                        className="text-xl text-accent hover:text-yellow-600 cursor-pointer transition-all"
+                        onClick={() => {
+                          navigate("/admin/update-product", {
+                            state: item,
+                          });
+                        }}
+                      />
                     </div>
                   </td>
                 </tr>

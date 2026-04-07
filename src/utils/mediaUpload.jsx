@@ -1,7 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 const anonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNla2h2eXhqYWJ2am9vem93c2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjE1NDksImV4cCI6MjA5MDgzNzU0OX0.0NbF1v00ZjvyByHXPl5XakoMLJmK3sBRGzeBgXfl24c";
-const supabaseUrl = "https://sekhvyxjabvjoozowsgk.supabase.co;";
+
+const supabaseUrl = "https://sekhvyxjabvjoozowsgk.supabase.co";
 
 const supabase = createClient(supabaseUrl, anonKey);
 
@@ -11,17 +12,17 @@ export default function MediaUpload(file) {
       reject("No file provided");
     } else {
       const timestamp = new Date().getTime();
-      const fileName = timestamp + fileName;
+      const fileName = timestamp + file.name;
       supabase.storage
         .from("images")
-        .upload(file.Name, file, {
-          upset: false,
+        .upload(fileName, file, {
+          upsert: false,
           cacheControl: "3600",
         })
         .then(() => {
           const publicUrl = supabase.storage
             .from("images")
-            .getPublicUrl(file.Name).data.publicUrl;
+            .getPublicUrl(fileName).data.publicUrl;
           resolve(publicUrl);
         })
         .catch(() => {
