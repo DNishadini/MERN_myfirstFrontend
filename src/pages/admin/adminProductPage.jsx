@@ -3,19 +3,59 @@ import { useEffect, useState } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { FaRegEdit } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
-
+import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 function ProductDeleteConfirm(props) {
-  const productId = props.productId;
+  const productID = props.productId;
+  const close = props.close;
+
+  function deleteProduct() {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(import.meta.env.VITE_API_URL + "/api/products/" + productID, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+        close();
+        toast.success("Product deleted successfully!");
+      })
+      .catch((error) => {
+        console.error("There was an error deleting the product!", error);
+      });
+  }
 
   return (
     <div className="fixed left-0 top-0 w-full h-screen bg-[#00000050] z-[100] flex justify-center items-center">
-      <div className="w-[500px] h-[200px] bg-white relative">
-        <button className="absolute right-[-42px] top-[-42px] w-[40px] h-[40px] bg-red-600 rounded-full text-white flex justify-center items-center font-bold border border-red-600 hover:bg-white hover:text-red-600">
+      <div className="w-[500px] h-[200px] bg-primary relative flex flex-col justify-center items-center gap-[40px] rounded-lg shadow-lg p-4">
+        <button
+          onClick={close}
+          className="absolute right-[-42px] top-[-42px] w-[40px] h-[40px] bg-red-600 rounded-full text-white flex justify-center items-center font-bold border border-red-600 hover:bg-white hover:text-red-600"
+        >
           X
         </button>
+        <p className="text-xl font-simibold">
+          Are you sure you want to delete this product with product ID:
+          {productID}?
+        </p>
+        <div className="flex gap-[40px]">
+          <button
+            onclick={close}
+            className="w-[100px] bg-blue-600 p-[5px] text-white hover:bg-accent"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={deleteProduct}
+            className="w-[70px] bg-red-600 p-[5px] text-white hover:bg-accent"
+          >
+            Yes
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -24,6 +64,7 @@ function ProductDeleteConfirm(props) {
 export default function AdminProductPage() {
   const [products, setProducts] = useState([]);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +79,14 @@ export default function AdminProductPage() {
 
   return (
     <div className="w-full h-full p-[20px] bg-gray-50">
-      {isDeleteConfirmVisible && <ProductDeleteConfirm />}
+      {isDeleteConfirmVisible && (
+        <ProductDeleteConfirm
+          productId={productToDelete}
+          close={() => {
+            setIsDeleteConfirmVisible(false);
+          }}
+        />
+      )}
       <Link
         to="/admin/add-product"
         className="fixed right-[50px] bottom-[50px] text-5xl hover:text-accent"
@@ -87,7 +135,10 @@ export default function AdminProductPage() {
                     <div className="flex justify-center gap-4">
                       <FaRegTrashCan
                         className="text-xl text-red-500 hover:text-red-700 cursor-pointer transition-all"
-                        onClick={() => setIsDeleteConfirmVisible(true)}
+                        onClick={() => {
+                          setProductToDelete(item.productID);
+                          setIsDeleteConfirmVisible(true);
+                        }}
                       />
                       <FaRegEdit
                         className="text-xl text-accent hover:text-yellow-600 cursor-pointer transition-all"
